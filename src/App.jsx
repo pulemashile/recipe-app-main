@@ -113,8 +113,10 @@ const RecipeForm = ({ onSubmit }) => {
           <a href="#" title="" className="text-base text-black transition-all duration-200 hover:text-opacity-80"> Resources </a>
           <a href="#" title="" className="text-base text-black transition-all duration-200 hover:text-opacity-80"> Pricing </a>
           <div className="w-px h-5 bg-black/20"></div>
-          <a href="#" title="" className="text-base font-semibold text-black transition-all duration-200 hover:text-opacity-80"> Log in </a>
-          <a href="#" title="" className="inline-flex items-center justify-center px-5 py-2.5 text-base font-semibold text-black border-2 border-black hover:bg-black hover:text-white transition-all duration-200 focus:bg-black focus:text-white" role="button"> Sign up </a>
+          <a href="#" title="" className="text-base font-semibold text-black transition-all duration-200 hover:text-opacity-80"> Login </a>
+          <a href="#" title="" className="inline-flex items-center justify-center px-5 py-2.5 text-base font-semibold text-black border-2
+           border-black hover:bg-black hover:text-white transition-all duration-200 focus:bg-black focus:text-white rounded-md" 
+           role="button"> Register </a>
         </div>      
       </div>
     </div>
@@ -151,7 +153,7 @@ const RecipeForm = ({ onSubmit }) => {
               </div>
 
               <div>
-                <img className="w-full" src="https://cdn.rareblocks.xyz/collection/celebration/images/hero/2/hero-img.png" alt="" />
+                <img className="w-full pl-6" src="src/assets/pic.png" />
               </div>
             </div>
           </div>
@@ -243,13 +245,22 @@ const App = () => {
     <div className="min-h-screen bg-gray-100 p-4">
       <div className="max-w-6xl mx-auto">
 
-        <header className="mb-8 absolute top-[10%] left-[50%] ">         
+        <header className="mb-8 absolute top-[18%] Left-[10%] ">         
+        <div className="flex items-center w-full max-w-md lg:max-w-xs mx-auto">
+          <div className="absolute right-2">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" color="#000000" fill="none">
+            <path d="M14 14L16.5 16.5" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
+            <path d="M16.4333 18.5252C15.8556 17.9475 15.8556 17.0109 16.4333 16.4333C17.0109 15.8556 17.9475 15.8556 18.5252 16.4333L21.5667 19.4748C22.1444 20.0525 22.1444 20.9891 21.5667 21.5667C20.9891 22.1444 20.0525 22.1444 19.4748 21.5667L16.4333 18.5252Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+            <path d="M16 9C16 5.13401 12.866 2 9 2C5.13401 2 2 5.13401 2 9C2 12.866 5.13401 16 9 16C12.866 16 16 12.866 16 9Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
+          </svg>
+          </div>
           <Input
             placeholder="Search recipes..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="max-w-md mx-auto"
           />
+        </div>
         </header>
 
         <RecipeForm onSubmit={handleAddRecipe} />
