@@ -1,0 +1,272 @@
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { Card, CardTitle, CardContent } from './components/card';
+import { Button } from './components/Button';
+import { Input } from './components/Input';
+import { Import } from 'lucide-react';
+import './App.css';
+
+const RecipeCard = ({ recipe, onDelete, onEdit }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedRecipe, setEditedRecipe] = useState(recipe);
+
+  const handleEditClick = () => {
+    if (isEditing) {
+      onEdit(editedRecipe);
+    }
+    setIsEditing(!isEditing);
+  };
+
+  return (
+    <Card>
+      <CardTitle>
+        {isEditing ? (
+          <Input
+            value={editedRecipe.label}
+            onChange={(e) => setEditedRecipe({ ...editedRecipe, label: e.target.value })}
+          />
+        ) : (
+          recipe.label
+        )}
+      </CardTitle>
+      <CardContent>
+        <img 
+          src={recipe.image || "/api/placeholder/300/200"} 
+          alt={recipe.label}
+          className="w-full h-48 object-cover rounded mb-2"
+        />
+        {isEditing ? (
+          <div className="space-y-2">
+            <Input
+              value={editedRecipe.image}
+              onChange={(e) => setEditedRecipe({ ...editedRecipe, image: e.target.value })}
+              placeholder="Image URL"
+            />
+            <Input
+              value={editedRecipe.source}
+              onChange={(e) => setEditedRecipe({ ...editedRecipe, source: e.target.value })}
+              placeholder="Source"
+            />
+            <Input
+              value={editedRecipe.ingredients}
+              onChange={(e) => setEditedRecipe({ ...editedRecipe, ingredients: e.target.value })}
+              placeholder="Ingredients"
+            />
+          </div>
+        ) : (
+          <>
+            <p><strong>Source:</strong> {recipe.source}</p>
+            <p><strong>Ingredients:</strong> {recipe.ingredients}</p>
+          </>
+        )}
+        <div className="flex gap-2 mt-4">
+          <Button 
+            onClick={handleEditClick} 
+            variant="outline"
+          >
+            {isEditing ? 'Save' : 'Edit'}
+          </Button>
+          {!isEditing && (
+            <Button onClick={() => onDelete(recipe.id)} variant="danger">
+              Delete
+            </Button>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+const RecipeForm = ({ onSubmit }) => {
+  const [recipe, setRecipe] = useState({
+    label: '',
+    image: '',
+    source: '',
+    ingredients: ''
+  });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSubmit(recipe);
+    setRecipe({ label: '', image: '', source: '', ingredients: '' });
+  };
+
+  return (
+    <>
+     <div className="bg-gradient-to-b from-green-50 to-green-100">
+      <header className="">
+  <div className="px-4 mx-auto sm:px-6 lg:px-8">
+    <div className="flex items-center justify-between h-16 lg:h-20">
+      <div className="flex-shrink-0">
+        <a href="#" title="" className="flex">
+          {/* <img className="w-auto h-8" src="https://cdn.rareblocks.xyz/collection/celebration/images/hero/2/logo.svg" alt="" /> */}Yummly.
+        </a>
+      </div>
+
+      <div className="flex items-center space-x-6 w-full lg:w-auto">
+        <div className="hidden lg:flex lg:items-center lg:justify-center lg:space-x-10">
+          <a href="#" title="" className="text-base text-black transition-all duration-200 hover:text-opacity-80"> Features </a>
+          <a href="#" title="" className="text-base text-black transition-all duration-200 hover:text-opacity-80"> Solutions </a>
+          <div className="flex items-center w-full max-w-md lg:max-w-xs mx-auto">
+        
+        </div>
+          <a href="#" title="" className="text-base text-black transition-all duration-200 hover:text-opacity-80"> Resources </a>
+          <a href="#" title="" className="text-base text-black transition-all duration-200 hover:text-opacity-80"> Pricing </a>
+          <div className="w-px h-5 bg-black/20"></div>
+          <a href="#" title="" className="text-base font-semibold text-black transition-all duration-200 hover:text-opacity-80"> Log in </a>
+          <a href="#" title="" className="inline-flex items-center justify-center px-5 py-2.5 text-base font-semibold text-black border-2 border-black hover:bg-black hover:text-white transition-all duration-200 focus:bg-black focus:text-white" role="button"> Sign up </a>
+        </div>      
+      </div>
+    </div>
+  </div>
+</header>
+
+
+        <section className="py-10 sm:py-16 lg:py-24">
+          <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+            <div className="grid items-center grid-cols-1 gap-12 lg:grid-cols-2">
+              <div>
+                <h1 className="text-3xl font-bold text-black sm:text-6xl lg:text-7xl">
+                With a vast collection of recipes
+                  <div className="relative inline-flex">
+                    <span className="absolute inset-x-0 bottom-0 border-b-[30px] border-[#4ADE80]"></span>
+                    <h1 className="relative text-4xl font-bold text-black sm:text-6xl lg:text-7xl"></h1>
+                  </div>
+                </h1>
+
+                <p className="mt-8 text-base text-black sm:text-xl">Yummly is a recipe app that offers personalized 
+                  recommendations based on your taste preferences and dietary restrictions <br></br>Yummly also allows 
+                  users to create shopping lists and save their favorite recipes for easy access.</p>
+
+                <div className="mt-10 sm:flex sm:items-center sm:space-x-8">
+                  <a href="#" title="" className="inline-flex items-center justify-center px-10 py-4 text-base font-semibold text-white transition-all duration-200 bg-[#D80032] hover:bg-[#D80032] focus:bg-orange-600" role="button"> Start exploring </a>
+                  <a href="#" title="" className="inline-flex items-center mt-6 text-base font-semibold transition-all duration-200 sm:mt-0 hover:opacity-80">
+                    <svg className="w-10 h-10 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path fill="#D80032" stroke="#F97316" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Watch video
+                  </a>
+                </div>
+              </div>
+
+              <div>
+                <img className="w-full" src="https://cdn.rareblocks.xyz/collection/celebration/images/hero/2/hero-img.png" alt="" />
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    <form onSubmit={handleSubmit} className="max-w-md mx-auto p-4">
+      <h2 className="text-2xl font-bold mb-4">Add New Recipe</h2>
+      <div className="space-y-4">
+        <Input
+          placeholder="Recipe Name"
+          value={recipe.label}
+          onChange={(e) => setRecipe({ ...recipe, label: e.target.value })}
+        />
+        <Input
+          placeholder="Image URL"
+          value={recipe.image}
+          onChange={(e) => setRecipe({ ...recipe, image: e.target.value })}
+        />
+        <Input
+          placeholder="Source"
+          value={recipe.source}
+          onChange={(e) => setRecipe({ ...recipe, source: e.target.value })}
+        />
+        <Input
+          placeholder="Ingredients (comma separated)"
+          value={recipe.ingredients}
+          onChange={(e) => setRecipe({ ...recipe, ingredients: e.target.value })}
+        />
+        <Button type="submit" variant="primary" className="w-full">
+          Add Recipe
+        </Button>
+      </div>
+    </form>
+    </>
+  );
+};
+
+const App = () => {
+  const [recipes, setRecipes] = useState([]);
+  const [search, setSearch] = useState('');
+
+  useEffect(() => {
+    fetchRecipes();
+  }, []);
+
+  const fetchRecipes = async () => {
+    try {
+      const response = await axios.get('http://localhost:3000/recipes');
+      setRecipes(response.data);
+    } catch (error) {
+      console.error('Error fetching recipes:', error);
+    }
+  };
+
+  const handleAddRecipe = async (newRecipe) => {
+    try {
+      const response = await axios.post('http://localhost:3000/recipes', newRecipe);
+      setRecipes([...recipes, response.data]);
+    } catch (error) {
+      console.error('Error adding recipe:', error);
+    }
+  };
+
+  const handleEditRecipe = async (updatedRecipe) => {
+    try {
+      await axios.put(`http://localhost:3000/recipes/${updatedRecipe.id}`, updatedRecipe);
+      setRecipes(recipes.map(recipe => 
+        recipe.id === updatedRecipe.id ? updatedRecipe : recipe
+      ));
+    } catch (error) {
+      console.error('Error updating recipe:', error);
+    }
+  };
+
+  const handleDeleteRecipe = async (id) => {
+    try {
+      await axios.delete(`http://localhost:3000/recipes/${id}`);
+      setRecipes(recipes.filter(recipe => recipe.id !== id));
+    } catch (error) {
+      console.error('Error deleting recipe:', error);
+    }
+  };
+
+  const filteredRecipes = recipes.filter(recipe =>
+    recipe.label.toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
+    <div className="min-h-screen bg-gray-100 p-4">
+      <div className="max-w-6xl mx-auto">
+
+        <header className="mb-8 absolute top-[10%] left-[50%] ">         
+          <Input
+            placeholder="Search recipes..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="max-w-md mx-auto"
+          />
+        </header>
+
+        <RecipeForm onSubmit={handleAddRecipe} />
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-8">
+          {filteredRecipes.map(recipe => (
+            <RecipeCard
+              key={recipe.id}
+              recipe={recipe}
+              onDelete={handleDeleteRecipe}
+              onEdit={handleEditRecipe}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default App;
