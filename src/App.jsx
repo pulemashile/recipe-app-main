@@ -6,6 +6,7 @@ import { Input } from './components/Input';
 import { Import } from 'lucide-react';
 import './App.css';
 
+// Enhanced RecipeCard component with prep and serving time
 const RecipeCard = ({ recipe, onDelete, onEdit }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedRecipe, setEditedRecipe] = useState(recipe);
@@ -48,6 +49,18 @@ const RecipeCard = ({ recipe, onDelete, onEdit }) => {
               placeholder="Source"
             />
             <Input
+              value={editedRecipe.prepTime}
+              onChange={(e) => setEditedRecipe({ ...editedRecipe, prepTime: e.target.value })}
+              placeholder="Prep Time (minutes)"
+              type="number"
+            />
+            <Input
+              value={editedRecipe.servingTime}
+              onChange={(e) => setEditedRecipe({ ...editedRecipe, servingTime: e.target.value })}
+              placeholder="Serving Time (minutes)"
+              type="number"
+            />
+            <Input
               value={editedRecipe.ingredients}
               onChange={(e) => setEditedRecipe({ ...editedRecipe, ingredients: e.target.value })}
               placeholder="Ingredients"
@@ -56,6 +69,10 @@ const RecipeCard = ({ recipe, onDelete, onEdit }) => {
         ) : (
           <>
             <p><strong>Source:</strong> {recipe.source}</p>
+            <div className="flex space-x-4 my-2">
+              <p><strong>Prep:</strong> {recipe.prepTime || 'N/A'} mins</p>
+              <p><strong>Serving:</strong> {recipe.servingTime || 'N/A'} mins</p>
+            </div>
             <p><strong>Ingredients:</strong> {recipe.ingredients}</p>
           </>
         )}
@@ -77,18 +94,79 @@ const RecipeCard = ({ recipe, onDelete, onEdit }) => {
   );
 };
 
+// Enhanced RecipeForm with validation
 const RecipeForm = ({ onSubmit }) => {
   const [recipe, setRecipe] = useState({
     label: '',
     image: '',
     source: '',
+    prepTime: '',
+    servingTime: '',
     ingredients: ''
   });
+  
+  const [errors, setErrors] = useState({});
+  const [touched, setTouched] = useState({});
+
+  const validate = () => {
+    const newErrors = {};
+    
+    if (!recipe.label.trim()) {
+      newErrors.label = 'Recipe name is required';
+    }
+    
+    if (recipe.prepTime && (isNaN(recipe.prepTime) || parseInt(recipe.prepTime) < 0)) {
+      newErrors.prepTime = 'Prep time must be a positive number';
+    }
+    
+    if (recipe.servingTime && (isNaN(recipe.servingTime) || parseInt(recipe.servingTime) < 0)) {
+      newErrors.servingTime = 'Serving time must be a positive number';
+    }
+    
+    if (!recipe.ingredients.trim()) {
+      newErrors.ingredients = 'Ingredients are required';
+    }
+    
+    return newErrors;
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setRecipe({ ...recipe, [name]: value });
+    setTouched({ ...touched, [name]: true });
+  };
+
+  const handleBlur = (e) => {
+    const { name } = e.target;
+    setTouched({ ...touched, [name]: true });
+    setErrors(validate());
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(recipe);
-    setRecipe({ label: '', image: '', source: '', ingredients: '' });
+    
+    // Mark all fields as touched to show all validation errors
+    const allTouched = Object.keys(recipe).reduce((acc, key) => {
+      acc[key] = true;
+      return acc;
+    }, {});
+    setTouched(allTouched);
+    
+    const validationErrors = validate();
+    setErrors(validationErrors);
+    
+    if (Object.keys(validationErrors).length === 0) {
+      onSubmit(recipe);
+      setRecipe({ 
+        label: '', 
+        image: '', 
+        source: '', 
+        prepTime: '', 
+        servingTime: '', 
+        ingredients: '' 
+      });
+      setTouched({});
+    }
   };
 
   return (
@@ -142,13 +220,6 @@ const RecipeForm = ({ onSubmit }) => {
 
                 <div className="mt-10 sm:flex sm:items-center sm:space-x-8">
                   <a href="#" title="" className="inline-flex items-center justify-center px-10 py-4 text-base font-semibold text-white transition-all duration-200 bg-[#D80032] hover:bg-[#D80032] focus:bg-orange-600" role="button"> Start exploring </a>
-                  {/* <a href="#" title="" className="inline-flex items-center mt-6 text-base font-semibold transition-all duration-200 sm:mt-0 hover:opacity-80">
-                    <svg className="w-10 h-10 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path fill="#D80032" stroke="#F97316" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    Watch video
-                  </a> */}
                 </div>
               </div>
 
@@ -162,26 +233,72 @@ const RecipeForm = ({ onSubmit }) => {
     <form onSubmit={handleSubmit} className="max-w-md mx-auto p-4">
       <h2 className="text-2xl font-bold mb-4">Add New Recipe</h2>
       <div className="space-y-4">
+        <div>
+          <Input
+            name="label"
+            placeholder="Recipe Name *"
+            value={recipe.label}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            className={errors.label && touched.label ? "border-red-500" : ""}
+          />
+          {errors.label && touched.label && <p className="text-red-500 text-sm mt-1">{errors.label}</p>}
+        </div>
+        
         <Input
-          placeholder="Recipe Name"
-          value={recipe.label}
-          onChange={(e) => setRecipe({ ...recipe, label: e.target.value })}
-        />
-        <Input
+          name="image"
           placeholder="Image URL"
           value={recipe.image}
-          onChange={(e) => setRecipe({ ...recipe, image: e.target.value })}
+          onChange={handleChange}
         />
+        
         <Input
+          name="source"
           placeholder="Source"
           value={recipe.source}
-          onChange={(e) => setRecipe({ ...recipe, source: e.target.value })}
+          onChange={handleChange}
         />
-        <Input
-          placeholder="Ingredients (comma separated)"
-          value={recipe.ingredients}
-          onChange={(e) => setRecipe({ ...recipe, ingredients: e.target.value })}
-        />
+        
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Input
+              name="prepTime"
+              placeholder="Prep Time (mins)"
+              type="number"
+              value={recipe.prepTime}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              className={errors.prepTime && touched.prepTime ? "border-red-500" : ""}
+            />
+            {errors.prepTime && touched.prepTime && <p className="text-red-500 text-sm mt-1">{errors.prepTime}</p>}
+          </div>
+          
+          <div>
+            <Input
+              name="servingTime"
+              placeholder="Serving Time (mins)"
+              type="number"
+              value={recipe.servingTime}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              className={errors.servingTime && touched.servingTime ? "border-red-500" : ""}
+            />
+            {errors.servingTime && touched.servingTime && <p className="text-red-500 text-sm mt-1">{errors.servingTime}</p>}
+          </div>
+        </div>
+        
+        <div>
+          <Input
+            name="ingredients"
+            placeholder="Ingredients (comma separated) *"
+            value={recipe.ingredients}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            className={errors.ingredients && touched.ingredients ? "border-red-500" : ""}
+          />
+          {errors.ingredients && touched.ingredients && <p className="text-red-500 text-sm mt-1">{errors.ingredients}</p>}
+        </div>
+        
         <Button type="submit" variant="primary" className="w-full">
           Add Recipe
         </Button>
@@ -247,13 +364,13 @@ const App = () => {
 
         <header className="mb-8 absolute top-[18%] Left-[10%] ">         
         <div className="flex items-center w-full max-w-md lg:max-w-xs mx-auto">
-          <div className="absolute right-2">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" color="#000000" fill="none">
-            <path d="M14 14L16.5 16.5" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
-            <path d="M16.4333 18.5252C15.8556 17.9475 15.8556 17.0109 16.4333 16.4333C17.0109 15.8556 17.9475 15.8556 18.5252 16.4333L21.5667 19.4748C22.1444 20.0525 22.1444 20.9891 21.5667 21.5667C20.9891 22.1444 20.0525 22.1444 19.4748 21.5667L16.4333 18.5252Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-            <path d="M16 9C16 5.13401 12.866 2 9 2C5.13401 2 2 5.13401 2 9C2 12.866 5.13401 16 9 16C12.866 16 16 12.866 16 9Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
-          </svg>
-          </div>
+        <div className="absolute right-2">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" color="#000000" fill="none">
+    <path d="M14 14L16.5 16.5" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+    <path d="M16.4333 18.5252C15.8556 17.9475 15.8556 17.0109 16.4333 16.4333C17.0109 15.8556 17.9475 15.8556 18.5252 16.4333L21.5667 19.4748C22.1444 20.0525 22.1444 20.9891 21.5667 21.5667C20.9891 22.1444 20.0525 22.1444 19.4748 21.5667L16.4333 18.5252Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    <path d="M16 9C16 5.13401 12.866 2 9 2C5.13401 2 2 5.13401 2 9C2 12.866 5.13401 16 9 16C12.866 16 16 12.866 16 9Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+  </svg>
+</div>
           <Input
             placeholder="Search recipes..."
             value={search}

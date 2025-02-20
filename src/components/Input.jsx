@@ -1,11 +1,14 @@
 import React from 'react';
 
-const Input = ({ 
+const Input = ({
   type = "text",
   placeholder,
   value,
   onChange,
-  className = ""
+  className = "",
+  name,
+  onBlur,
+  ...props 
 }) => {
   return (
     <input
@@ -13,7 +16,10 @@ const Input = ({
       placeholder={placeholder}
       value={value}
       onChange={onChange}
+      onBlur={onBlur}
+      name={name}
       className={`border rounded px-3 py-2 w-full focus:outline-none focus:border-blue-500 ${className}`}
+      {...props}
     />
   );
 };
